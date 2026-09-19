@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---- restored from the pre-Next.js build (src/index.css + src/App.css) ---- */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+/* customize container here using tailwindcss */
+.section-container {
+  @apply px-4 sm:px-6 lg:px-8 py-16 container mx-auto;
+}
+
+.active {
+  color: red;
+}
+
+.wrtys-text {
+  color: #288987;
+}
+.wrtys-text::after {
+  background-color: #288987;
+}
+.bg-wrtys-700 {
+  background-color: #0b3d3e;
+}
+.bg-wrtys {
+  background-color: #288987;
+}
+.border-blue-wrtys {
+  border-color: #288987;
+}
+.wrtys-text-600 {
+  font-weight: bold;
+  color: #288987;
+}
+.border-radius-5 {
+  border-radius: 5px;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.testimonials-swiper {
+  padding: 20px 0;
+}
+
+.testimonials-swiper .swiper-slide {
+  height: auto;
+}
+
+/* Hide default Swiper navigation buttons */
+.testimonials-swiper .swiper-button-next::after,
+.testimonials-swiper .swiper-button-prev::after {
+  display: none;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  display: none;
+}
+
+.swiper-button-next-custom.swiper-button-disabled,
+.swiper-button-prev-custom.swiper-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.orcidImg {
+  max-width: 20px;
+  display: inline-block;
+}
