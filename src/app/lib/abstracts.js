@@ -5,7 +5,7 @@ import { db } from "./db";
 // of {name, organization, orcidId} objects (84 rows), "[]" (25), and a plain
 // comma/semicolon-separated string (24). Normalize all of them to one array shape
 // so the view only ever sees an array.
-function parseCoAuthors(value) {
+export function parseCoAuthors(value) {
     if (typeof value !== "string") return [];
     const raw = value.trim();
     if (!raw) return [];
