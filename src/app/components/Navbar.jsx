@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HiMenu, HiX } from 'react-icons/hi'
+import { HiMenu, HiX, HiChevronDown } from 'react-icons/hi'
 import { motion } from "framer-motion";
 import { fadeIn} from "../utils/motion";
 
@@ -15,13 +15,16 @@ const Navbar = () => {
   const pathname = usePathname()
 
   // The section anchors only exist on the home page, so nothing is highlighted
-  // while the reader is on a sub-page like /wrt2026.
+  // while the reader is on a sub-page like /events/wrt2026.
   const isHome = pathname === '/'
 
   // Leading slash: without it these resolve against the current route and do
   // nothing on any page but the home page.
   const navLinks = [
     { href: "/#home", label: "Home" },
+    { label: "Events", children: [
+      { href: "/events/wrt2026", label: "WRT2026" },
+    ] },
     { href: "/#about", label: "Our Purpose" },
     { href: "/#help", label: "About Us" },
   ]
@@ -69,7 +72,39 @@ const Navbar = () => {
           variants={fadeIn('down', 0.3)}
           className="hidden md:flex items-center gap-10"
         >
-          {navLinks.map((link, index) => (
+          {navLinks.map((link, index) => link.children ? (
+            // Opens on hover and on keyboard focus; the pt-3 bridge keeps the
+            // menu open while the pointer crosses the gap below the trigger.
+            <motion.div
+              key={index}
+              variants={fadeIn('down', 0.1 * (index + 1))}
+              className="relative group"
+            >
+              <button
+                type="button"
+                aria-haspopup="true"
+                className={`flex items-center gap-1 text-sm font-medium wrtys-text hover:text-gray-900
+                  ${pathname.startsWith('/events') ? 'underline decoration-blue-600 decoration-2 underline-offset-8' : ''}`}
+              >
+                {link.label}
+                <HiChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
+              </button>
+              <div className="absolute left-0 top-full pt-3 hidden group-hover:block group-focus-within:block">
+                <div className="min-w-40 bg-white border border-gray-100 rounded-lg shadow-lg py-2">
+                  {link.children.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className={`block px-4 py-2 text-sm font-medium hover:bg-gray-50
+                        ${pathname === child.href ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          ) : (
             <MotionLink
               key={index}
               variants={fadeIn('down', 0.1 * (index + 1))}
@@ -98,7 +133,22 @@ const Navbar = () => {
             variants={fadeIn('down', 0.3)}
             className="container mx-auto px-4 space-y-4"
           >
-            {navLinks.map((link, index) => (
+            {navLinks.map((link, index) => link.children ? (
+              <motion.div key={index} variants={fadeIn('right', 0.1 * (index + 1))}>
+                <span className="block text-sm font-medium py-2 text-gray-600">{link.label}</span>
+                {link.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`block text-sm font-medium py-2 pl-4
+                      ${pathname === child.href ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'}`}
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </motion.div>
+            ) : (
               <MotionLink
                 key={index}
                 variants={fadeIn('right', 0.1 * (index + 1))}

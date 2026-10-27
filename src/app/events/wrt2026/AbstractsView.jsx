@@ -113,7 +113,7 @@ export default function AbstractsView({ abstracts }) {
                                                 <div className="min-w-0 max-w-[68ch]">
                                                     <h3 className="text-[1.0625rem] font-medium leading-snug text-[#0b3d3e]">
                                                         <Link
-                                                            href={`/wrt2026/abstracts/${abstract.id}`}
+                                                            href={`/events/wrt2026/abstracts/${abstract.id}`}
                                                             className="underline-offset-4 hover:text-[#288987] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#288987]"
                                                         >
                                                             {abstract.abstract_title}

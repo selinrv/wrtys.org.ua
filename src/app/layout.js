@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "NGO 'WRTYS'",
-  description: "Website of NGO WRTYSp",
+  description: "Website of NGO WRTYS",
 };
 
 export default function RootLayout({ children }) {

@@ -46,8 +46,8 @@ export default async function AbstractPage({ params }) {
     // affiliation to tell apart.
     const showAffiliations = abstract.institutionList.length > 1;
     const backHref = abstract.topicSlug
-        ? `/wrt2026#${abstract.topicSlug}`
-        : "/wrt2026";
+        ? `/events/wrt2026#${abstract.topicSlug}`
+        : "/events/wrt2026";
 
     return (
         <article className="font-sans container mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">

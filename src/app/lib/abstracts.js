@@ -58,9 +58,10 @@ export const slugify = (value) =>
 
 const ABSTRACT_COLUMNS = `id, abstract_title, abstract, author, institutions, co_authors, orcidId, topic, type`;
 
-// Rows without a usable title are treated as non-existent everywhere, so the
-// list and the detail page agree on which abstracts are public.
-const PUBLISHED = `abstract_title IS NOT NULL AND TRIM(abstract_title) <> ''`;
+// Only rows marked active and with a usable title are public. Everything else is
+// treated as non-existent everywhere, so the list and the detail page agree on
+// which abstracts are public.
+const PUBLISHED = `active = 1 AND abstract_title IS NOT NULL AND TRIM(abstract_title) <> ''`;
 
 function normalizeRow(row) {
     const coAuthors = parseCoAuthors(row.co_authors);
@@ -102,11 +103,12 @@ function normalizeRow(row) {
 }
 
 export const getAbstracts = cache(async () => {
+    // Newest first, the same order as the WRT2026 abstracts book.
     const [rows] = await db.query(
         `SELECT ${ABSTRACT_COLUMNS}
          FROM Registration
          WHERE ${PUBLISHED}
-         ORDER BY createdAt ASC`
+         ORDER BY id DESC`
     );
     return rows.map(normalizeRow);
 });
