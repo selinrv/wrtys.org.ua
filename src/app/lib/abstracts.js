@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { db } from "./db";
+import { BOOK_ORDER } from "./abstracts-book";
 
 // co_authors is a longtext column holding three historical formats: a JSON array
 // of {name, organization, orcidId} objects (84 rows), "[]" (25), and a plain
@@ -38,8 +39,9 @@ export function parseCoAuthors(value) {
 
 // Institution names are free text, so the same organization can arrive with
 // different case, punctuation, smart quotes or a leading "The". Compare on a
-// normalized form rather than the raw string.
-function normalizeOrg(value) {
+// normalized form rather than the raw string. Titles are matched against the
+// printed book the same way, since the book sets them in capitals.
+function normalizeText(value) {
     return String(value ?? "")
         .normalize("NFKD")
         .replace(/[\u0300-\u036f]/gu, "")                              // combining diacritics
@@ -55,6 +57,28 @@ export const slugify = (value) =>
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
+
+// Each topic is a conference session with its own page. Abstracts submitted
+// without one still need a session to belong to.
+const OTHER_SESSION = "Other contributions";
+
+// Position in the printed book, by registration id first and then by title, for
+// an abstract resubmitted under an id the book never saw. Anything the book
+// does not contain sorts after it.
+const bookPositionById = new Map();
+const bookPositionByTitle = new Map();
+BOOK_ORDER.forEach(({ ids, title }, position) => {
+    for (const id of ids) bookPositionById.set(id, position);
+    bookPositionByTitle.set(normalizeText(title), position);
+});
+
+function bookPosition(row) {
+    return (
+        bookPositionById.get(row.id) ??
+        bookPositionByTitle.get(normalizeText(row.abstract_title)) ??
+        BOOK_ORDER.length
+    );
+}
 
 const ABSTRACT_COLUMNS = `id, abstract_title, abstract, author, institutions, co_authors, orcidId, topic, type`;
 
@@ -74,7 +98,7 @@ function normalizeRow(row) {
     const indexByKey = new Map();
 
     const addInstitution = (value) => {
-        const key = normalizeOrg(value);
+        const key = normalizeText(value);
         if (!key) return undefined;
         if (!indexByKey.has(key)) {
             indexByKey.set(key, institutionList.length);
@@ -84,10 +108,12 @@ function normalizeRow(row) {
     };
 
     const authorInstitutionIndex = addInstitution(row.institutions);
+    const session = row.topic?.trim() || OTHER_SESSION;
 
     return {
         ...row,
-        topicSlug: slugify(row.topic),
+        session,
+        sessionSlug: slugify(session),
         co_authors: coAuthors.map((coAuthor) => ({
             ...coAuthor,
             institutionIndex: addInstitution(coAuthor.organization),
@@ -103,14 +129,33 @@ function normalizeRow(row) {
 }
 
 export const getAbstracts = cache(async () => {
-    // Newest first, the same order as the WRT2026 abstracts book.
+    // The order of the printed abstracts book. It is close to newest first but
+    // not quite, so the book decides; the sort is stable, so abstracts it does
+    // not contain keep the newest-first order from the query.
     const [rows] = await db.query(
         `SELECT ${ABSTRACT_COLUMNS}
          FROM Registration
          WHERE ${PUBLISHED}
          ORDER BY id DESC`
     );
-    return rows.map(normalizeRow);
+    return rows
+        .sort((a, b) => bookPosition(a) - bookPosition(b))
+        .map(normalizeRow);
+});
+
+// Grouped on the slug rather than the raw topic, so two spellings of the same
+// free-text topic share one page instead of colliding on one URL. Largest
+// sessions first; abstracts keep the book order within each.
+export const getSessions = cache(async () => {
+    const groups = new Map();
+
+    for (const abstract of await getAbstracts()) {
+        const slug = abstract.sessionSlug;
+        if (!groups.has(slug)) groups.set(slug, { topic: abstract.session, slug, items: [] });
+        groups.get(slug).items.push(abstract);
+    }
+
+    return [...groups.values()].sort((a, b) => b.items.length - a.items.length);
 });
 
 export const getAbstractById = cache(async (id) => {

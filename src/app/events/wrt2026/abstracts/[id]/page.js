@@ -45,9 +45,7 @@ export default async function AbstractPage({ params }) {
     // Superscripts only earn their place when there is more than one
     // affiliation to tell apart.
     const showAffiliations = abstract.institutionList.length > 1;
-    const backHref = abstract.topicSlug
-        ? `/events/wrt2026#${abstract.topicSlug}`
-        : "/events/wrt2026";
+    const backHref = `/events/wrt2026/sessions/${abstract.sessionSlug}`;
 
     return (
         <article className="font-sans container mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-24">
@@ -56,7 +54,7 @@ export default async function AbstractPage({ params }) {
                     href={backHref}
                     className="inline-block text-sm leading-snug text-[#288987] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#288987]"
                 >
-                    &larr; {abstract.topic?.trim() || "All abstracts"}
+                    &larr; {abstract.session}
                 </Link>
 
                 <h1 className="mt-6 text-3xl sm:text-4xl font-semibold leading-tight tracking-tight text-[#0b3d3e]">
@@ -122,7 +120,7 @@ export default async function AbstractPage({ params }) {
                         href={backHref}
                         className="text-sm text-[#288987] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#288987]"
                     >
-                        &larr; {abstract.topic?.trim() || "All abstracts"}
+                        &larr; {abstract.session}
                     </Link>
                 </div>
             </div>

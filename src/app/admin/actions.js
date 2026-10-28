@@ -83,11 +83,13 @@ export async function logout() {
     redirect("/admin/login");
 }
 
-// The public pages are ISR (revalidate = 60 in wrt2026/page.js), so an edit
-// would otherwise take up to a minute to show. Drop both caches on every write.
+// The public pages are ISR (revalidate = 60 in events/wrt2026/page.js), so an
+// edit would otherwise take up to a minute to show. Drop every cache on each
+// write: a changed topic moves the abstract between two session pages.
 function revalidatePublicPages(id) {
-    revalidatePath("/wrt2026");
-    if (id) revalidatePath(`/wrt2026/abstracts/${id}`);
+    revalidatePath("/events/wrt2026");
+    revalidatePath("/events/wrt2026/sessions/[slug]", "page");
+    if (id) revalidatePath(`/events/wrt2026/abstracts/${id}`);
 }
 
 export async function saveRegistration(prevState, formData) {

@@ -27,7 +27,7 @@ export default async function EditRegistrationPage({ params, searchParams }) {
     if (!registration) notFound();
 
     // The same reader the public pages use, so the editor shows exactly what
-    // /wrt2026 will render — including the legacy comma-separated rows.
+    // /events/wrt2026 will render — including the legacy comma-separated rows.
     const coAuthors = parseCoAuthors(registration.co_authors);
     const isPublished = Boolean(registration.abstract_title?.trim());
 
@@ -53,10 +53,10 @@ export default async function EditRegistrationPage({ params, searchParams }) {
                 <p className="mt-2 text-sm text-gray-500">
                     Public page:{" "}
                     <Link
-                        href={`/wrt2026/abstracts/${registration.id}`}
+                        href={`/events/wrt2026/abstracts/${registration.id}`}
                         className="text-[#288987] underline-offset-4 hover:underline"
                     >
-                        /wrt2026/abstracts/{registration.id}
+                        /events/wrt2026/abstracts/{registration.id}
                     </Link>
                 </p>
             )}

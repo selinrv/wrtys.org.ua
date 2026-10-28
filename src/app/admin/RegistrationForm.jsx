@@ -221,14 +221,18 @@ export default function RegistrationForm({ registration, coAuthors, suggestions 
                     </select>
                 </Field>
 
-                <Field
-                    label="Invoice URL"
-                    htmlFor="invoiceUrl"
-                    error={errors.invoiceUrl}
-                    hint="Optional."
-                >
-                    <Link className="rounded-md bg-[#288987] px-5 py-2 text-sm font-medium text-white hover:bg-[#1f6f6d] disabled:opacity-60" href={`https://wrt2026.com.ua/invoices/invoice-${registration.invoiceUrl}.pdf`}>Download</Link>
-                </Field>
+                {/* Read-only here, but the save action writes every column, so the
+                    stored value has to travel with the form or saving clears it.
+                    A new registration has no invoice yet. */}
+                <div>
+                    <p className={LABEL_CLASS}>Invoice</p>
+                    <input type="hidden" name="invoiceUrl" value={values.invoiceUrl} />
+                    {registration?.invoiceUrl ? (
+                        <Link className="mt-1.5 inline-block rounded-md bg-[#288987] px-5 py-2 text-sm font-medium text-white hover:bg-[#1f6f6d]" href={`https://wrt2026.com.ua/invoices/invoice-${registration.invoiceUrl}.pdf`}>Download</Link>
+                    ) : (
+                        <p className="mt-1.5 text-sm text-gray-400">No invoice.</p>
+                    )}
+                </div>
 
             </section>
 
